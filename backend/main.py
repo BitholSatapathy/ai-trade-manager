@@ -32,7 +32,10 @@ def run_pipeline(symbol):
     rsi = compute_rsi(data)
     ma = moving_average(data)
 
-    news = fetch_news(symbol)
+    try:
+        news = fetch_news(symbol)
+    except Exception:
+        news = []
     sentiment = get_sentiment(news)
 
     decision, confidence = make_decision(rsi, sentiment)
