@@ -28,40 +28,45 @@ if query:
 		symbol = results[selected]
 
 		if st.button("Analyze"):
-			result = run_pipeline(symbol)
+			try:
+				result = run_pipeline(symbol)
 
-			st.subheader(f"{selected} ({symbol})")
+				st.subheader(f"{selected} ({symbol})")
 
-			col1, col2, col3 = st.columns(3)
+				col1, col2, col3 = st.columns(3)
 
-			col1.metric("RSI", f"{result['rsi']:.2f}")
-			col2.metric("Moving Avg", f"{result['moving_avg']:.2f}")
-			col3.metric("Sentiment", result["sentiment"])
+				col1.metric("RSI", f"{result['rsi']:.2f}")
+				col2.metric("Moving Avg", f"{result['moving_avg']:.2f}")
+				col3.metric("Sentiment", result["sentiment"])
 
-			decision = result["decision"]
+				decision = result["decision"]
 
-			if decision == "BUY":
-				st.success(f"📈 Decision: {decision}")
-			elif decision == "SELL":
-				st.error(f"📉 Decision: {decision}")
-			else:
-				st.warning(f"⚖️ Decision: {decision}")
+				if decision == "BUY":
+					st.success(f"📈 Decision: {decision}")
+				elif decision == "SELL":
+					st.error(f"📉 Decision: {decision}")
+				else:
+					st.warning(f"⚖️ Decision: {decision}")
 
-			st.subheader("Confidence Level")
+				st.subheader("Confidence Level")
 
-			st.progress(result["confidence"] / 100)
-			st.write(f"{result['confidence']}% confidence")
+				st.progress(result["confidence"] / 100)
+				st.write(f"{result['confidence']}% confidence")
 
-			st.subheader("🧠 AI Insight")
-			st.info(result["reason"])
+				st.subheader("🧠 AI Insight")
+				st.info(result["reason"])
 
-			if "data" in result and "Close" in result["data"]:
-				df = result["data"].copy()
-				df["MA20"] = df["Close"].rolling(20).mean()
+				if "data" in result and "Close" in result["data"]:
+					df = result["data"].copy()
+					df["MA20"] = df["Close"].rolling(20).mean()
 
-				st.subheader("📊 Price Trend with Moving Average")
-				st.line_chart(df[["Close", "MA20"]])
-			else:
-				st.warning("Price chart data is unavailable in this run. Please click Analyze again.")
+					st.subheader("📊 Price Trend with Moving Average")
+					st.line_chart(df[["Close", "MA20"]])
+				else:
+					st.warning("Price chart data is unavailable in this run. Please click Analyze again.")
+			except ValueError as err:
+				st.warning(str(err))
+			except Exception:
+				st.error("We could not analyze this stock right now. Please try again in a minute.")
 	else:
 		st.warning("No matching stocks found")
