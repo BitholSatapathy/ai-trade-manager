@@ -32,11 +32,11 @@ def run_pipeline(symbol):
     rsi = compute_rsi(data)
     ma = moving_average(data)
 
-    news = fetch_news()
+    news = fetch_news(symbol)
     sentiment = get_sentiment(news)
 
-    decision = make_decision(rsi, sentiment)
-    reason = generate_reason(rsi, sentiment)
+    decision, confidence = make_decision(rsi, sentiment)
+    reason = generate_reason(rsi, sentiment, decision)
 
     return {
         "symbol": symbol,
@@ -44,7 +44,9 @@ def run_pipeline(symbol):
         "moving_avg": ma,
         "sentiment": sentiment,
         "decision": decision,
-        "reason": reason
+        "confidence": confidence,
+        "reason": reason,
+        "data": data
     }
 
 

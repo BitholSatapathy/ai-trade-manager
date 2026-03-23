@@ -2,6 +2,9 @@ from textblob import TextBlob
 
 
 def get_sentiment(news_list):
+    if not news_list:
+        return "Neutral"
+
     scores = []
 
     for news in news_list:
