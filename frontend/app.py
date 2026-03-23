@@ -3,7 +3,11 @@ import sys
 
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
+
+try:
+	import plotly.graph_objects as go
+except Exception:
+	go = None
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
@@ -107,15 +111,27 @@ if query:
 				if chart_df.empty:
 					st.error("No chart data available")
 				else:
-					fig, ax = plt.subplots(figsize=(10, 4))
-					ax.plot(chart_df.index, chart_df["Close"], label="Close", linewidth=1.8)
-					ax.plot(chart_df.index, chart_df["MA20"], label="MA20", linewidth=1.8)
-					ax.set_xlabel("Days")
-					ax.set_ylabel("Price")
-					ax.legend()
-					ax.grid(alpha=0.25)
-					st.pyplot(fig)
-					plt.close(fig)
+					if go is not None:
+						fig = go.Figure()
+						fig.add_trace(
+							go.Scatter(
+								y=chart_df["Close"],
+								mode="lines",
+								name="Close",
+							)
+						)
+						fig.add_trace(
+							go.Scatter(
+								y=chart_df["MA20"],
+								mode="lines",
+								name="MA20",
+							)
+						)
+						fig.update_layout(height=360, margin=dict(l=20, r=20, t=30, b=20))
+						st.plotly_chart(fig, use_container_width=True)
+					else:
+						# Safe fallback that does not rely on plotting backends.
+						st.line_chart(chart_df[["Close", "MA20"]])
 			except ValueError as err:
 				analyze_stock.clear()
 				st.warning(str(err))
