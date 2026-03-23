@@ -1,5 +1,13 @@
+from pathlib import Path
+import sys
+
 import streamlit as st
 import pandas as pd
+
+ROOT_DIR = Path(__file__).resolve().parents[1]
+if str(ROOT_DIR) not in sys.path:
+	sys.path.insert(0, str(ROOT_DIR))
+
 from backend.main import run_pipeline
 from backend.utils.search import search_stock
 
