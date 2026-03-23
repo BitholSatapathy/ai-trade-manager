@@ -11,6 +11,11 @@ if str(ROOT_DIR) not in sys.path:
 from backend.main import run_pipeline
 from backend.utils.search import search_stock
 
+
+@st.cache_data(ttl=300, show_spinner=False)
+def analyze_stock(symbol):
+	return run_pipeline(symbol)
+
 st.title("📈 AI Trade Manager (Indian Market)")
 st.caption("AI-powered stock analysis system for Indian markets 🇮🇳")
 
@@ -29,7 +34,7 @@ if query:
 
 		if st.button("Analyze"):
 			try:
-				result = run_pipeline(symbol)
+				result = analyze_stock(symbol)
 
 				st.subheader(f"{selected} ({symbol})")
 
@@ -50,8 +55,9 @@ if query:
 
 				st.subheader("Confidence Level")
 
-				st.progress(result["confidence"] / 100)
-				st.write(f"{result['confidence']}% confidence")
+				confidence = result.get("confidence", 50)
+				st.progress(confidence / 100)
+				st.write(f"{confidence}% confidence")
 
 				st.subheader("🧠 AI Insight")
 				st.info(result["reason"])
