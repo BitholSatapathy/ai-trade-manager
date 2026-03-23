@@ -1,4 +1,5 @@
 yfinance
+pandas-datareader
 pandas
 numpy
 scikit-learn

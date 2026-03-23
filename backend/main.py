@@ -29,8 +29,6 @@ def run_pipeline(symbol):
             f"No market data found for '{symbol}'. Use a Yahoo Finance ticker, e.g. RELIANCE.NS"
         )
 
-    print(data.tail())
-
     try:
         rsi = compute_rsi(data)
         ma = moving_average(data)
