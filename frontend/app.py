@@ -3,6 +3,7 @@ import sys
 
 import streamlit as st
 import pandas as pd
+import matplotlib.pyplot as plt
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
@@ -106,7 +107,15 @@ if query:
 				if chart_df.empty:
 					st.error("No chart data available")
 				else:
-					st.line_chart(chart_df[["Close", "MA20"]])
+					fig, ax = plt.subplots(figsize=(10, 4))
+					ax.plot(chart_df.index, chart_df["Close"], label="Close", linewidth=1.8)
+					ax.plot(chart_df.index, chart_df["MA20"], label="MA20", linewidth=1.8)
+					ax.set_xlabel("Days")
+					ax.set_ylabel("Price")
+					ax.legend()
+					ax.grid(alpha=0.25)
+					st.pyplot(fig)
+					plt.close(fig)
 			except ValueError as err:
 				analyze_stock.clear()
 				st.warning(str(err))
