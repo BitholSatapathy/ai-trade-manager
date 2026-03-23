@@ -65,8 +65,14 @@ if query:
 				if "data" in result and "Close" in result["data"]:
 					try:
 						df = result["data"].copy()
+
+						close_data = df["Close"]
+						if isinstance(close_data, pd.DataFrame):
+							# yfinance may return duplicate/multi-level Close columns; use the first valid series.
+							close_data = close_data.iloc[:, 0]
+
 						chart_df = pd.DataFrame()
-						chart_df["Close"] = pd.to_numeric(df["Close"], errors="coerce")
+						chart_df["Close"] = pd.to_numeric(close_data, errors="coerce")
 						chart_df["MA20"] = chart_df["Close"].rolling(20, min_periods=1).mean()
 						chart_df = chart_df.dropna(subset=["Close"]).reset_index(drop=True)
 
