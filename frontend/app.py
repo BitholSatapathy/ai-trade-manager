@@ -319,27 +319,38 @@ if app_mode == "Stock Analysis":
                 with st.spinner(f"Analyzing {selected}..."):
                     try:
                         result = analyze_stock(symbol)
+                    except ValueError as err:
+                        analyze_stock.clear()
+                        st.warning(str(err))
+                        st.stop()
+                    except Exception as err:
+                        analyze_stock.clear()
+                        import traceback
+                        st.error(f"We could not analyze this stock right now. Please try again. Error: {type(err).__name__} - {str(err)}")
+                        st.code(traceback.format_exc())
+                        st.stop()
                         
-                        st.markdown(f"<h2 class='slide-up'>{selected} ({symbol})</h2>", unsafe_allow_html=True)
+                    st.markdown(f"<h2 class='slide-up'>{selected} ({symbol})</h2>", unsafe_allow_html=True)
+                    
+                    # Decision Banner
+                    decision = result["decision"]
+                    confidence = result.get("confidence", 50)
                         
-                        # Decision Banner
-                        decision = result["decision"]
-                        confidence = result.get("confidence", 50)
-                        
-                        if decision == "BUY":
-                            st.success(f"Action Reccomendation: BUY ({confidence}% confidence)")
-                        elif decision == "SELL":
-                            st.error(f"Action Reccomendation: SELL ({confidence}% confidence)")
-                        else:
-                            st.warning(f"Action Reccomendation: HOLD ({confidence}% confidence)")
+                    if decision == "BUY":
+                        st.success(f"Action Reccomendation: BUY ({confidence}% confidence)")
+                    elif decision == "SELL":
+                        st.error(f"Action Reccomendation: SELL ({confidence}% confidence)")
+                    else:
+                        st.warning(f"Action Reccomendation: HOLD ({confidence}% confidence)")
 
-                        # Core Metrics Row (Animated)
-                        col1, col2, col3, col4 = st.columns(4)
-                        col1.metric("Tech: RSI", f"{result['rsi']:.2f}")
-                        col2.metric("Tech: Moving Avg", f"INR {result['moving_avg']:.2f}")
-                        col3.metric("News Sentiment", result["sentiment"])
-                        col4.metric("AI Score", f"{result['score']:+.1f}")
+                    # Core Metrics Row (Animated)
+                    col1, col2, col3, col4 = st.columns(4)
+                    col1.metric("Tech: RSI", f"{result['rsi']:.2f}")
+                    col2.metric("Tech: Moving Avg", f"INR {result['moving_avg']:.2f}")
+                    col3.metric("News Sentiment", result["sentiment"])
+                    col4.metric("AI Score", f"{result['score']:+.1f}")
 
+                    if True:
                         st.markdown("<div class='fade-in'>", unsafe_allow_html=True)
                         tab1, tab2, tab3, tab4 = st.tabs(["Overview", "Fundamentals", "Financials", "News"])
                         
@@ -434,13 +445,6 @@ if app_mode == "Stock Analysis":
                                     </div>
                                     """, unsafe_allow_html=True)
                         st.markdown("</div>", unsafe_allow_html=True)
-
-                    except ValueError as err:
-                        analyze_stock.clear()
-                        st.warning(str(err))
-                    except Exception as err:
-                        analyze_stock.clear()
-                        st.error("We could not analyze this stock right now. Please try again.")
         else:
             st.warning("No matching stocks found. Try a different name.")
 

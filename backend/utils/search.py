@@ -1,6 +1,6 @@
 from rapidfuzz import fuzz, process
 
-from .stocks import STOCKS, ALIASES
+from backend.utils.stocks import STOCKS, ALIASES
 
 
 def search_stock(query, limit=10):
