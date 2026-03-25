@@ -1,20 +1,11 @@
-try:
-    from backend.collector.stock_data import fetch_stock
-    from backend.collector.news_data import fetch_news
-    from backend.indicators.rsi import compute_rsi
-    from backend.indicators.moving_avg import moving_average
-    from backend.ai.sentiment import get_sentiment
-    from backend.ai.reasoning import generate_reason
-    from backend.advisor.decision import make_decision
-except ModuleNotFoundError:
-    # Fallback for running this file directly: python backend/main.py
-    from collector.stock_data import fetch_stock
-    from collector.news_data import fetch_news
-    from indicators.rsi import compute_rsi
-    from indicators.moving_avg import moving_average
-    from ai.sentiment import get_sentiment
-    from ai.reasoning import generate_reason
-    from advisor.decision import make_decision
+from backend.collector.stock_data import fetch_stock
+from backend.collector.company_data import fetch_fundamentals, fetch_financials
+from backend.collector.news_data import fetch_news, get_headlines
+from backend.indicators.rsi import compute_rsi
+from backend.indicators.moving_avg import moving_average
+from backend.ai.sentiment import get_sentiment
+from backend.ai.reasoning import generate_reason
+from backend.advisor.decision import make_decision
 
 
 def run_pipeline(symbol):
@@ -33,14 +24,34 @@ def run_pipeline(symbol):
         rsi = compute_rsi(data)
         ma = moving_average(data)
 
+        # Fundamentals & financials (non-blocking — failures return empty dicts)
+        try:
+            fundamentals = fetch_fundamentals(symbol)
+        except Exception:
+            fundamentals = {}
+
+        try:
+            financials = fetch_financials(symbol)
+        except Exception:
+            financials = {"years": [], "revenue": [], "net_income": [], "net_worth": []}
+
+        # News (enriched format)
         try:
             news = fetch_news(symbol)
         except Exception:
             news = []
-        sentiment = get_sentiment(news)
+        headlines = get_headlines(news) if news else []
+        sentiment = get_sentiment(headlines)
 
-        decision, confidence = make_decision(rsi, sentiment)
-        reason = generate_reason(rsi, sentiment, decision)
+        # AI decision with fundamentals awareness
+        decision, confidence, score, fund_notes = make_decision(rsi, sentiment, fundamentals)
+        reason = generate_reason(
+            rsi, sentiment, decision,
+            fundamentals=fundamentals,
+            financials=financials,
+            score=score,
+            fund_notes=fund_notes,
+        )
     except ValueError:
         raise
     except Exception as exc:
@@ -53,8 +64,13 @@ def run_pipeline(symbol):
         "sentiment": sentiment,
         "decision": decision,
         "confidence": confidence,
+        "score": score,
+        "fund_notes": fund_notes,
         "reason": reason,
-        "data": data
+        "data": data,
+        "fundamentals": fundamentals,
+        "financials": financials,
+        "news": news,
     }
 
 
