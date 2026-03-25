@@ -1,6 +1,7 @@
 """Portfolio analysis module — diversification, sector analysis, index comparison."""
 
-from backend.collector.stock_data import fetch_fundamentals, fetch_stock
+from backend.collector.stock_data import fetch_stock
+from backend.collector.company_data import fetch_fundamentals
 from backend.utils.stocks import STOCKS
 
 

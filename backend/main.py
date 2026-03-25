@@ -1,4 +1,5 @@
-from backend.collector.stock_data import fetch_stock, fetch_fundamentals, fetch_financials
+from backend.collector.stock_data import fetch_stock
+from backend.collector.company_data import fetch_fundamentals, fetch_financials
 from backend.collector.news_data import fetch_news, get_headlines
 from backend.indicators.rsi import compute_rsi
 from backend.indicators.moving_avg import moving_average
