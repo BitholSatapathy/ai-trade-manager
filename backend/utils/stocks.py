@@ -156,6 +156,7 @@ STOCKS = {
     "NHPC": "NHPC.NS",
     "SJVN": "SJVN.NS",
     "Torrent Power": "TORNTPOWER.NS",
+    "Inox Wind": "INOXWIND.NS",
     "GAIL India": "GAIL.NS",
     "Petronet LNG": "PETRONET.NS",
     "Gujarat Gas": "GUJGASLTD.NS",
