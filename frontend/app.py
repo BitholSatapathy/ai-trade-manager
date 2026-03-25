@@ -259,7 +259,8 @@ def build_price_chart(raw_data):
 def build_financial_bar_chart(years, values, title, color):
     if not years or not values or go is None:
         return None
-    df = pd.DataFrame({"Year": years, "Value": values})
+    min_len = min(len(years), len(values))
+    df = pd.DataFrame({"Year": years[:min_len], "Value": values[:min_len]})
     df = df.dropna()
     if df.empty:
         return None
