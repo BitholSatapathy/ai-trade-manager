@@ -1,19 +1,10 @@
-try:
-    from backend.collector.stock_data import fetch_stock, fetch_fundamentals, fetch_financials
-    from backend.collector.news_data import fetch_news, get_headlines
-    from backend.indicators.rsi import compute_rsi
-    from backend.indicators.moving_avg import moving_average
-    from backend.ai.sentiment import get_sentiment
-    from backend.ai.reasoning import generate_reason
-    from backend.advisor.decision import make_decision
-except ModuleNotFoundError:
-    from collector.stock_data import fetch_stock, fetch_fundamentals, fetch_financials
-    from collector.news_data import fetch_news, get_headlines
-    from indicators.rsi import compute_rsi
-    from indicators.moving_avg import moving_average
-    from ai.sentiment import get_sentiment
-    from ai.reasoning import generate_reason
-    from advisor.decision import make_decision
+from backend.collector.stock_data import fetch_stock, fetch_fundamentals, fetch_financials
+from backend.collector.news_data import fetch_news, get_headlines
+from backend.indicators.rsi import compute_rsi
+from backend.indicators.moving_avg import moving_average
+from backend.ai.sentiment import get_sentiment
+from backend.ai.reasoning import generate_reason
+from backend.advisor.decision import make_decision
 
 
 def run_pipeline(symbol):

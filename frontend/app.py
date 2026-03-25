@@ -23,7 +23,7 @@ from backend.collector.stock_data import fetch_index_quotes
 from backend.advisor.portfolio import analyze_portfolio
 
 # Page Config
-st.set_page_config(page_title="AI Trade Manager", layout="wide")
+st.set_page_config(page_title="Acclewealth", layout="wide")
 
 
 # Custom CSS styling (animations, typography, layout) - strictly NO EMOJIS
@@ -202,7 +202,7 @@ def render_ticker_tape():
 
 
 # Sidebar Navigation
-st.sidebar.title("AI Trade Manager")
+st.sidebar.title("Acclewealth")
 app_mode = st.sidebar.radio("Navigation", ["Stock Analysis", "Portfolio Dashboard"])
 
 
