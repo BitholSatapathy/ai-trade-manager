@@ -2,6 +2,7 @@ from pathlib import Path
 import sys
 
 import streamlit as st
+import streamlit.components.v1 as components
 import pandas as pd
 
 try:
@@ -20,64 +21,6 @@ from backend.collector.stock_data import fetch_index_quotes
 
 # ── Page Config ───────────────────────────────────────────────────────────
 st.set_page_config(page_title="AI Trade Manager", page_icon="📈", layout="wide")
-
-# ── Custom CSS for ticker tape ────────────────────────────────────────────
-st.markdown("""
-<style>
-@keyframes ticker-scroll {
-    0%   { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-}
-.ticker-wrap {
-    width: 100%;
-    overflow: hidden;
-    background: linear-gradient(90deg, #0d1117 0%, #161b22 50%, #0d1117 100%);
-    border-radius: 8px;
-    padding: 10px 0;
-    margin-bottom: 20px;
-    border: 1px solid #30363d;
-}
-.ticker-content {
-    display: inline-flex;
-    white-space: nowrap;
-    animation: ticker-scroll 30s linear infinite;
-}
-.ticker-item {
-    display: inline-flex;
-    align-items: center;
-    padding: 0 24px;
-    font-family: 'Segoe UI', sans-serif;
-    font-size: 14px;
-    color: #c9d1d9;
-}
-.ticker-name {
-    font-weight: 600;
-    margin-right: 8px;
-    color: #f0f6fc;
-}
-.ticker-price {
-    margin-right: 8px;
-    color: #c9d1d9;
-}
-.ticker-up {
-    color: #3fb950;
-    font-weight: 600;
-}
-.ticker-down {
-    color: #f85149;
-    font-weight: 600;
-}
-.ticker-flat {
-    color: #8b949e;
-    font-weight: 600;
-}
-.ticker-sep {
-    color: #30363d;
-    margin: 0 4px;
-    font-size: 18px;
-}
-</style>
-""", unsafe_allow_html=True)
 
 
 # ── Ticker Tape ───────────────────────────────────────────────────────────
@@ -109,24 +52,93 @@ def render_ticker_tape():
             css_class = "ticker-flat"
             sign = ""
 
-        items_html += f"""
+        items_html += f'''
         <span class="ticker-item">
             <span class="ticker-name">{name}</span>
             <span class="ticker-price">₹{price:,.2f}</span>
             <span class="{css_class}">{arrow} {sign}{change:.2f}%</span>
         </span>
         <span class="ticker-sep">│</span>
-        """
+        '''
 
-    # Duplicate content for seamless scrolling loop
-    st.markdown(f"""
-    <div class="ticker-wrap">
-        <div class="ticker-content">
-            {items_html}
-            {items_html}
+    # Self-contained HTML rendered in an iframe via st.components.v1.html
+    ticker_html = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <style>
+        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+        body {{
+            background: transparent;
+            overflow: hidden;
+            font-family: 'Segoe UI', -apple-system, sans-serif;
+        }}
+        .ticker-wrap {{
+            width: 100%;
+            overflow: hidden;
+            background: linear-gradient(90deg, #0d1117 0%, #161b22 50%, #0d1117 100%);
+            border-radius: 8px;
+            padding: 12px 0;
+            border: 1px solid #30363d;
+        }}
+        .ticker-content {{
+            display: inline-flex;
+            white-space: nowrap;
+            animation: ticker-scroll 35s linear infinite;
+        }}
+        .ticker-content:hover {{
+            animation-play-state: paused;
+        }}
+        @keyframes ticker-scroll {{
+            0%   {{ transform: translateX(0); }}
+            100% {{ transform: translateX(-50%); }}
+        }}
+        .ticker-item {{
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0 20px;
+            font-size: 13px;
+            color: #c9d1d9;
+        }}
+        .ticker-name {{
+            font-weight: 700;
+            color: #f0f6fc;
+            letter-spacing: 0.3px;
+        }}
+        .ticker-price {{
+            color: #c9d1d9;
+        }}
+        .ticker-up {{
+            color: #3fb950;
+            font-weight: 600;
+        }}
+        .ticker-down {{
+            color: #f85149;
+            font-weight: 600;
+        }}
+        .ticker-flat {{
+            color: #8b949e;
+            font-weight: 600;
+        }}
+        .ticker-sep {{
+            color: #30363d;
+            padding: 0 2px;
+            font-size: 16px;
+        }}
+    </style>
+    </head>
+    <body>
+        <div class="ticker-wrap">
+            <div class="ticker-content">
+                {items_html}
+                {items_html}
+            </div>
         </div>
-    </div>
-    """, unsafe_allow_html=True)
+    </body>
+    </html>
+    """
+    components.html(ticker_html, height=50, scrolling=False)
 
 
 render_ticker_tape()
